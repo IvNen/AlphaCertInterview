@@ -9,11 +9,17 @@ namespace CanWeFixItService
     {
         // See SQLite In-Memory example:
         // https://github.com/dotnet/docs/blob/main/samples/snippets/standard/data/sqlite/InMemorySample/Program.cs
-        
+
         // Using a name and a shared cache allows multiple connections to access the same
         // in-memory database
         const string connectionString = "Data Source=DatabaseService;Mode=Memory;Cache=Shared";
         private SqliteConnection _connection;
+
+        public DatabaseService(string connectionString)
+        {
+            _connection = new SqliteConnection(connectionString);
+            _connection.Open();
+        }
 
         public DatabaseService()
         {
@@ -22,15 +28,20 @@ namespace CanWeFixItService
             _connection = new SqliteConnection(connectionString);
             _connection.Open();
         }
-        
-        public IEnumerable<Instrument> Instruments()
+
+        public async Task<IEnumerable<Instrument>> Instruments()
         {
-            return _connection.QueryAsync<Instrument>("SQL GOES HERE");
+            return await _connection.QueryAsync<Instrument>("SELECT * FROM instrument WHERE Active = 1");
         }
 
-        public async Task<IEnumerable<MarketData>> MarketData()
+        public async Task<IEnumerable<MarketDataDto>> MarketData()
         {
-            return await _connection.QueryAsync<MarketData>("SELECT Id, DataValue FROM MarketData WHERE Active = 0");
+            return await _connection.QueryAsync<MarketDataDto>("SELECT\r\nm.id,\r\nm.dataValue,\r\ni.id AS InstrumentId,\r\nm.active\r\nFROM marketdata m\r\nJOIN instrument i\r\nON m.sedol = i.sedol\r\nWHERE m.active = 1");
+        }
+
+        public async Task<IEnumerable<MarketValuation>> MarketValuation()
+        {
+            return await _connection.QueryAsync<MarketValuation>("SELECT\r\n'DataValueTotal' AS 'name',\r\nSUM(m.datavalue) AS total\r\nFROM marketdata m\r\nWHERE m.active = 1");
         }
 
         /// <summary>
@@ -59,7 +70,7 @@ namespace CanWeFixItService
                        (9, 'Sedol9', 'Name9', 0)";
 
             _connection.Execute(createInstruments);
-            
+
             const string createMarketData = @"
                 CREATE TABLE marketdata
                 (
