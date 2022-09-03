@@ -1,0 +1,173 @@
+{
+	"info": {
+		"_postman_id": "ab7bd8f2-1ed2-4a8d-bbd7-18baf11a7130",
+		"name": "AlphaCertIntetview",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16820978"
+	},
+	"item": [
+		{
+			"name": "v1/instuments",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseJson = pm.response.json();\r",
+							"pm.test(\"Returned instruments count is 4\", () =>{\r",
+							"    pm.expect(responseJson.length).to.equal(4);\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Check all items are active\", () =>{\r",
+							"    _.each(responseJson, (item) => {\r",
+							"        var fieldIsActive = false;\r",
+							"        if (item.active == 1){\r",
+							"            fieldIsActive = true;\r",
+							"        }\r",
+							"        pm.expect(fieldIsActive).to.be.true;\r",
+							"    })\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check that instrument id is in (2,4,6,8)\", () => {\r",
+							"    _.each(responseJson, (item) => {\r",
+							"        var idInArray = false;\r",
+							"        if (item.id == 2 || item.id == 4 || item.id == 6 || item.id == 8){\r",
+							"            idInArray = true;\r",
+							"        }\r",
+							"        pm.expect(idInArray).to.be.true;\r",
+							"    })\r",
+							"\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5010/v1/instruments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5010",
+					"path": [
+						"v1",
+						"instruments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "v1/marketData",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseJson = pm.response.json();\r",
+							"pm.test(\"Check count returned is 2\", () => {\r",
+							"    pm.expect(responseJson.length).to.equal(2)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Check all items are active\", () =>{\r",
+							"    _.each(responseJson, (item) => {\r",
+							"        var fieldIsActive = false;\r",
+							"        if (item.active == 1){\r",
+							"            fieldIsActive = true;\r",
+							"        }\r",
+							"        pm.expect(fieldIsActive).to.be.true;\r",
+							"    })\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check that id is in (2,4)\", () => {\r",
+							"    _.each(responseJson, (item) => {\r",
+							"        var idInArray = false;\r",
+							"        if (item.id == 2 || item.id == 4 ){\r",
+							"            idInArray = true;\r",
+							"        }\r",
+							"        pm.expect(idInArray).to.be.true;\r",
+							"    })\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Check that instrument id is in (2,4)\", () => {\r",
+							"    _.each(responseJson, (item) => {\r",
+							"        var idInArray = false;\r",
+							"        if (item.instrumentId == 2 || item.instrumentId == 4 ){\r",
+							"            idInArray = true;\r",
+							"        }\r",
+							"        pm.expect(idInArray).to.be.true;\r",
+							"    })\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5010/v1/marketdata",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5010",
+					"path": [
+						"v1",
+						"marketdata"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "v1/valuations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseJson = pm.response.json();\r",
+							"pm.test(\"Check a single item is returned in response.\", () =>\r",
+							"{\r",
+							"    pm.expect(responseJson.length).to.equal(1);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name value is DataValueTotal.\", () =>\r",
+							"{\r",
+							"    pm.expect(responseJson[0].name).to.equal(\"DataValueTotal\")\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Total value is 13332\", () => {\r",
+							"    pm.expect(responseJson[0].total).to.equal(13332);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5010/v1/valuations",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5010",
+					"path": [
+						"v1",
+						"valuations"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
