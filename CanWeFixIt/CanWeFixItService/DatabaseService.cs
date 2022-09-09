@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -31,17 +32,35 @@ namespace CanWeFixItService
 
         public async Task<IEnumerable<Instrument>> Instruments()
         {
-            return await _connection.QueryAsync<Instrument>("SELECT * FROM instrument WHERE Active = 1");
+            return await RunQueryAsync<Instrument>("SELECT * FROM instrument WHERE Active = 1");
         }
 
-        public async Task<IEnumerable<MarketDataDto>> MarketData()
+        public async Task<IEnumerable<MarketData>> MarketData()
         {
-            return await _connection.QueryAsync<MarketDataDto>("SELECT\r\nm.id,\r\nm.dataValue,\r\ni.id AS InstrumentId,\r\nm.active\r\nFROM marketdata m\r\nJOIN instrument i\r\nON m.sedol = i.sedol\r\nWHERE m.active = 1");
+            return await RunQueryAsync<MarketData>("SELECT\r\nm.id,\r\nm.dataValue,\r\ni.id AS InstrumentId,\r\nm.active\r\nFROM marketdata m\r\nJOIN instrument i\r\nON m.sedol = i.sedol\r\nWHERE m.active = 1");
         }
 
         public async Task<IEnumerable<MarketValuation>> MarketValuation()
         {
-            return await _connection.QueryAsync<MarketValuation>("SELECT\r\n'DataValueTotal' AS 'name',\r\nSUM(m.datavalue) AS total\r\nFROM marketdata m\r\nWHERE m.active = 1");
+            return await RunQueryAsync<MarketValuation>("SELECT\r\n'DataValueTotal' AS 'name',\r\nSUM(m.datavalue) AS total\r\nFROM marketdata m\r\nWHERE m.active = 1");
+        }
+
+        private async Task<IEnumerable<T>> RunQueryAsync<T>(string sqlQuery)
+        {
+            try
+            {
+                return await _connection.QueryAsync<T>(sqlQuery);
+            }
+            catch (SqliteException sqliteException)
+            {
+                Console.WriteLine("SQL Exception occurred.");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Log exception and deal with it.");
+            }
+
+            return new List<T>();
         }
 
         /// <summary>

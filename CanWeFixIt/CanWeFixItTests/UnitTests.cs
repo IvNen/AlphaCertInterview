@@ -24,24 +24,15 @@ namespace CanWeFixItTests
             var data = databaseService.MarketData().Result;
 
             // Check correct type of object is returned
-            Assert.IsType<MarketDataDto>(data.FirstOrDefault());
-
+            Assert.IsType<MarketData>(data.FirstOrDefault());
             // Check count returned is 2 
             Assert.Equal(2, data.Count());
-
-            foreach (var item in data)
-            {
-                // Check each item is active in the collection
-                Assert.True(item.Active);
-
-                // Check id is either 2 or 4
-                Assert.InRange(item.Id, 2, 4);
-
-                // Check instrumentId is either 2 or 4
-                Assert.InRange(item.InstrumentId.Value, 2, 4);
-            }
-
-
+            // Check each item is active in the collection
+            Assert.True(data.All(x => x.Active));
+            // Check id is either 2 or 4
+            Assert.True(data.All(x => x.Id is 2 or 4));
+            // Check instrumentId is either 2 or 4
+            Assert.True(data.All(x => x.InstrumentId is 2 or 4));
         }
 
         [Fact]
@@ -51,18 +42,12 @@ namespace CanWeFixItTests
 
             //Check correct type is returned
             Assert.IsType<Instrument>(data.FirstOrDefault());
-
             // Check count returned is 4
             Assert.Equal(4, data.Count());
-
-            foreach (var item in data)
-            {
-                // Check each item is active in the collection
-                Assert.True(item.Active);
-
-                // Check id is either in range 2-8 
-                Assert.InRange(item.Id, 2, 8);
-            }
+            // Check each item is active in the collection
+            Assert.True(data.All(x => x.Active));
+            // Check id is either in range 2-8 
+            Assert.True(data.All(x => x.Id is 2 or 4 or 6 or 8));
         }
 
         [Fact]
@@ -70,11 +55,11 @@ namespace CanWeFixItTests
         {
             var marketValuationData = databaseService.MarketValuation().Result;
 
-            // Check is the correct content type
-            Assert.IsType<MarketValuation>(marketValuationData.FirstOrDefault());
-
             // Check only one value returned in the list
             Assert.Single(marketValuationData);
+
+            // Check is the correct content type
+            Assert.IsType<MarketValuation>(marketValuationData.FirstOrDefault());
 
             // Check total returned
             Assert.Equal(13332, marketValuationData.FirstOrDefault().Total);

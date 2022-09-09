@@ -17,9 +17,9 @@ namespace CanWeFixItApi.Controllers
         }
 
         // GET
-        public async Task<ActionResult<IEnumerable<MarketDataDto>>> Get()
+        public async Task<ActionResult<IEnumerable<MarketData>>> Get()
         {
-
+            var data = await _database.MarketData();
             return Ok(await _database.MarketData());
         }
     }
